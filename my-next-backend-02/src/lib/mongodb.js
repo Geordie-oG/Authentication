@@ -1,45 +1,29 @@
-import { MongoClient } from "mongodb"; 
+import { MongoClient } from "mongodb";
 
- 
+const options = {};
 
-const options = {}; 
+let globalClientPromise;
 
-let globalClientPromise; 
+export function getClientPromise() {
+  const uri = process.env.MONGODB_URI;
 
- 
+  if (!uri) {
+    throw new Error(
+      "Please add your Mongo URI to .env.local or set MONGODB_URI env variable",
+    );
+  }
 
-export function getClientPromise() { 
+  if (process.env.NODE_ENV === "development") {
+    if (!globalClientPromise) {
+      const client = new MongoClient(uri, options);
 
-  const uri = process.env.MONGODB_URI; 
+      globalClientPromise = client.connect();
+    }
 
-  if (!uri) { 
+    return globalClientPromise;
+  } else {
+    const client = new MongoClient(uri, options);
 
-    throw new Error( 
-
-      "Please add your Mongo URI to .env.local or set MONGODB_URI env variable", 
-
-    ); 
-
-  } 
-
-  if (process.env.NODE_ENV === "development") { 
-
-    if (!globalClientPromise) { 
-
-      const client = new MongoClient(uri, options); 
-
-      globalClientPromise = client.connect(); 
-
-    } 
-
-    return globalClientPromise; 
-
-  } else { 
-
-    const client = new MongoClient(uri, options); 
-
-    return client.connect(); 
-
-  } 
-
-} 
+    return client.connect();
+  }
+}
