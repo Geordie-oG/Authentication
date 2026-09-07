@@ -97,7 +97,7 @@ async function checkUser(email, password) {
       return false;
     } else return user;
   } catch (error) {
-    console.log("exception", exception.toString());
+    console.log("exception", error.toString());
   }
 }
 
